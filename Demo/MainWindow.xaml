@@ -33,13 +33,12 @@
         </Grid.RowDefinitions>
         <!--The tab control with with tab tearing support.-->
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
-                             MaximumTabWidth="200"
+                             MaximumTabWidth="200"                             
                              TabPersistBehavior="All"
-                             AddTabButtonBehavior="OpenNewTab"
-                             Background="AliceBlue"
+                             TabHeight="50"                             
+                             AddTabButtonBehavior="OpenNewTab"                             
                              ItemsSource="{Binding ItemCollection}"
-                             SelectedItem="{Binding SelectedTab}"
-                             SelectedTabBrush="WhiteSmoke"
+                             SelectedItem="{Binding SelectedTab}"                                                      
                              CanMoveTabs="{Binding CanMoveTabs}"
                              DragWindowWithOneTab="True"
                              IsAddButtonVisible="{Binding ShowAddButton}"
@@ -49,6 +48,11 @@
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
                              TabTearTriggerDistance="10"
                              TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
+            <ct:ChromeTabControl.SelectedContentTemplate>
+                <DataTemplate>
+                    <Rectangle Width="300" Height="300" Fill="Yellow"/>
+                </DataTemplate>
+            </ct:ChromeTabControl.SelectedContentTemplate>
             <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
             <ct:ChromeTabControl.Template>
                 <ControlTemplate TargetType="{x:Type ct:ChromeTabControl}">
@@ -58,25 +62,25 @@
                     </ControlTemplate.Resources>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Border Background="{TemplateBinding Background}"
                                 BorderThickness="0,0,0,1"
                                 BorderBrush="#FF999999"
+                                Height="{TemplateBinding TabHeight}"
                                 Grid.Row="0"
                                 Padding="10,5,10,0">
                             <ct:ChromeTabPanel IsItemsHost="True"
                                                Background="{TemplateBinding Background}" />
                         </Border>
-
-                        <Grid Grid.Row="1"
-                              Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToContentPresenterVisibilityConverter}}">
-                            <ContentPresenter Content="{TemplateBinding SelectedContent}" />
-                        </Grid>
-                        <Grid x:Name="PART_ItemsHolder"
+                        <ContentPresenter Grid.Row="1"
+                                          ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                          Content="{TemplateBinding SelectedContent}"/>
+                        <!--<Grid x:Name="PART_ItemsHolder"
                               Grid.Row="1"
                               Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToItemHolderVisibilityConverter}}" />
+                        -->
                     </Grid>
                 </ControlTemplate>
             </ct:ChromeTabControl.Template>
@@ -150,15 +154,13 @@
             <Button x:Name="BnOpenPinnedTabExample"
                     Content="Pinned tab example"
                     HorizontalAlignment="Left"
-                    Margin="5"
-                    
+                    Margin="5"                    
                     Grid.Row="1"
                     Click="BnOpenPinnedTabExample_Click" />
             <Button x:Name="BnOpenCustomStyleExample"
                     Content="Custom style example"
                     HorizontalAlignment="Left"
-                    Margin="5"
-                   
+                    Margin="5"                   
                     Grid.Row="1"
                     Click="BnOpenCustomStyleExample_Click" />
         </StackPanel>

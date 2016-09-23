@@ -68,8 +68,7 @@ namespace ChromeTabs
         // Using a DependencyProperty as the backing store for IsPinned.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsPinnedProperty =
             DependencyProperty.Register("IsPinned", typeof(bool), typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
-
-
+        
 
         public Brush SelectedTabBrush
         {

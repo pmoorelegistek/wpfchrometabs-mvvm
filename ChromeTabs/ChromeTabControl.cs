@@ -225,6 +225,31 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             DependencyProperty.Register("DragWindowWithOneTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
 
 
+        #region Brush UnselectedTabBrush dependency property
+        public static readonly DependencyProperty UnselectedTabBrushProperty = DependencyProperty.Register("UnselectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata((Brush)Brushes.White,
+                                                               (obj, args) =>
+                                                               {
+                                                                   ((ChromeTabControl)obj).OnUnselectedTabBrushChanged(args);
+                                                               }));
+        public Brush UnselectedTabBrush
+        {
+            get
+            {
+                return (Brush)GetValue(UnselectedTabBrushProperty);
+            }
+            set
+            {
+                SetValue(UnselectedTabBrushProperty, value);
+            }
+        }
+        private void OnUnselectedTabBrushChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // TODO: Add event handler if needed
+        }
+        #endregion
+
+
+
         public Brush SelectedTabBrush
         {
             get { return (Brush)GetValue(SelectedTabBrushProperty); }
@@ -377,7 +402,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             ChromeTabControl ct = (ChromeTabControl)d;
             if (((TabPersistBehavior)e.NewValue) == TabPersistBehavior.None)
             {
-                ct.itemsHolder.Children.Clear();
+                ct.itemsHolder?.Children?.Clear();
             }
             else
             {
@@ -410,7 +435,51 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         public static readonly DependencyProperty AddTabButtonBehaviorProperty =
             DependencyProperty.Register("AddTabButtonBehavior", typeof(AddTabButtonBehavior), typeof(ChromeTabControl), new PropertyMetadata(AddTabButtonBehavior.OpenNewTab));
 
+        #region DataTemplate SelectedContentTemplate dependency property
+        public static DependencyProperty SelectedContentTemplateProperty = DependencyProperty.Register("SelectedContentTemplate", typeof(DataTemplate), typeof(ChromeTabControl), new PropertyMetadata((DataTemplate)null,
+                                                               (obj, args) =>
+                                                               {
+                                                                   ((ChromeTabControl)obj).OnSelectedContentTemplateChanged(args);
+                                                               }));
+        public DataTemplate SelectedContentTemplate
+        {
+            get
+            {
+                return (DataTemplate)GetValue(SelectedContentTemplateProperty);
+            }
+            set
+            {
+                SetValue(SelectedContentTemplateProperty, value);
+            }
+        }
+        private void OnSelectedContentTemplateChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // TODO: Add event handler if needed
+        }
+        #endregion
 
+        #region double TabHeight dependency property
+        public static readonly DependencyProperty TabHeightProperty = DependencyProperty.Register("TabHeight", typeof(double), typeof(ChromeTabControl), new PropertyMetadata((double)25,
+                                                                       (obj, args) =>
+                                                                       {
+                                                                           ((ChromeTabControl)obj).OnTabHeightChanged(args);
+                                                                       }));
+        public double TabHeight
+        {
+            get
+            {
+                return (double)GetValue(TabHeightProperty);
+            }
+            set
+            {
+                SetValue(TabHeightProperty, value);
+            }
+        }
+        private void OnTabHeightChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // TODO: Add event handler if needed
+        }
+        #endregion
 
         public ControlTemplate AddButtonTemplate
         {
@@ -456,9 +525,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
-            if (e.NewValue != null && ctc.SelectedItem != null)
-                ctc.AsTabItem(ctc.SelectedItem).SelectedTabBrush = (Brush)e.NewValue;
+            ChromeTabItem cti = ctc.AsTabItem(ctc.SelectedItem);
+            if (cti != null && e.NewValue != null && ctc.SelectedItem != null)
+                cti.SelectedTabBrush = (Brush)e.NewValue;
         }
+
         /// <summary>
         /// Grabs hold of the tab based on the input viewmodel and positions it at the mouse cursor.
         /// </summary>
@@ -519,7 +590,6 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             }
         }
 
-
         public object SelectedContent
         {
             get { return (object)GetValue(SelectedContentProperty); }
@@ -538,18 +608,18 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             }
             return -1;
         }
+
         internal void ChangeSelectedIndex(int index)
         {
-
             //  int index = this.GetTabIndex(item);
             if (Items.Count <= index)
                 return;
             ChromeTabItem item = AsTabItem(Items[index]);
             ChangeSelectedItem(item);
         }
+
         internal void ChangeSelectedItem(ChromeTabItem item)
         {
-
             int index = this.GetTabIndex(item);
             if (index != this.SelectedIndex)
             {
@@ -605,13 +675,13 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 v.Margin = new Thickness(0);
             }
             this.SelectedItem = fromTab;
-
         }
 
         internal void SetCanAddTab(bool value)
         {
             SetValue(CanAddTabPropertyKey, value);
         }
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -703,11 +773,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-
             base.OnSelectionChanged(e);
             this.SetChildrenZ();
-
-
             SetSelectedContent(e.AddedItems.Count == 0);
         }
         protected void SetSelectedContent(bool removeContent)
@@ -836,7 +903,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             // the actual child to be added.  cp.Tag is a reference to the TabItem
             cp = new ContentPresenter();
             cp.Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item;
-            //cp.ContentTemplate = this.SelectedContentTemplate;
+            cp.ContentTemplate = this.SelectedContentTemplate;
             //cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
             //cp.ContentStringFormat = this.SelectedContentStringFormat;
             cp.Visibility = Visibility.Collapsed;
